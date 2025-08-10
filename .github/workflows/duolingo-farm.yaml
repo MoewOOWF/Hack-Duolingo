@@ -1,0 +1,78 @@
+name: Duolingo Auto Farm
+
+on:
+  workflow_dispatch:
+    inputs:
+      farming_type:
+        description: 'Type of farming (all/xp/gems/streaks)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - xp
+        - gems
+        - streaks
+      xp_loops:
+        description: 'XP farming loops'
+        required: false
+        default: '50'
+        type: string
+      gems_loops:
+        description: 'Gems farming loops'
+        required: false
+        default: '30'
+        type: string
+      streaks_loops:
+        description: 'Streaks farming loops'
+        required: false
+        default: '10'
+        type: string
+
+  schedule:
+    - cron: '0 */6 * * *'
+
+jobs:
+  farm:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Update config
+      run: |
+        cat > config.json << EOF
+        {
+          "xp_loops": ${{ github.event.inputs.xp_loops || 50 }},
+          "gems_loops": ${{ github.event.inputs.gems_loops || 30 }},
+          "streaks_loops": ${{ github.event.inputs.streaks_loops || 10 }},
+          "farming_type": "${{ github.event.inputs.farming_type || 'all' }}",
+          "delay_between_requests": 500,
+          "max_concurrent_requests": 3,
+          "retry_attempts": 3,
+          "request_timeout": 10000
+        }
+        EOF
+        
+    - name: Run Duolingo Farm
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+      run: npm start
+      
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: duolingo-farm-results
+        path: results.json
+        retention-days: 7
