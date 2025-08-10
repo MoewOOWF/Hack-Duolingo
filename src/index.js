@@ -110,9 +110,26 @@ class DuolingoAutoFarm {
 
     saveResults(results) {
         try {
-            fs.writeFileSync('results.json', JSON.stringify(results, null, 2));
+            const resultsData = {
+                ...results,
+                summary: {
+                    totalXP: results.xp?.xpGained || 0,
+                    totalGems: results.gems?.gemsGained || 0,
+                    totalStreaks: results.streaks?.streaksGained || 0,
+                    totalRequests: (results.xp?.requestCount || 0) + (results.gems?.requestCount || 0) + (results.streaks?.requestCount || 0),
+                    totalErrors: (results.xp?.errorCount || 0) + (results.gems?.errorCount || 0) + (results.streaks?.errorCount || 0)
+                }
+            };
+            fs.writeFileSync('results.json', JSON.stringify(resultsData, null, 2));
+            console.log('\n📊 Results Summary:');
+            console.log(`- Total XP: ${resultsData.summary.totalXP}`);
+            console.log(`- Total Gems: ${resultsData.summary.totalGems}`);
+            console.log(`- Total Streaks: ${resultsData.summary.totalStreaks}`);
+            console.log(`- Total Requests: ${resultsData.summary.totalRequests}`);
+            console.log(`- Total Errors: ${resultsData.summary.totalErrors}`);
         } catch (error) {
             console.error('Error saving results:', error.message);
+            fs.writeFileSync('results.json', JSON.stringify({ error: error.message, timestamp: new Date().toISOString() }, null, 2));
         }
     }
 }
