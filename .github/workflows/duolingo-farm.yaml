@@ -44,7 +44,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
         
     - name: Install dependencies
       run: npm install
@@ -71,8 +70,11 @@ jobs:
       
     - name: Upload results
       uses: actions/upload-artifact@v4
-      if: always()
+      if: success() || failure()
       with:
-        name: duolingo-farm-results
-        path: results.json
+        name: duolingo-farm-results-${{ github.run_number }}
+        path: |
+          results.json
+          *.log
+        if-no-files-found: ignore
         retention-days: 7
