@@ -93,6 +93,11 @@ jobs:
         }
         EOF
         
+    - name: Run tests first
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+      run: node src/test.js
+        
     - name: Run Duolingo Farm
       env:
         TOKEN: ${{ secrets.TOKEN }}
