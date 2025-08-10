@@ -1,9 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
-const Auth = require('./auth');
-const XPFarmer = require('./xpFarmer');
-const GemsFarmer = require('./gemsFarmer');
-const StreaksFarmer = require('./streaksFarmer');
+const Auth = require('./auth.js');
+const XPFarmer = require('./xpFarmer.js');
+const GemsFarmer = require('./gemsFarmer.js');
+const StreaksFarmer = require('./streaksFarmer.js');
 
 class DuolingoAutoFarm {
     constructor() {
@@ -15,10 +15,23 @@ class DuolingoAutoFarm {
 
     loadConfig() {
         try {
-            const configData = fs.readFileSync('config.json', 'utf8');
-            return JSON.parse(configData);
+            const configPath = './config.json';
+            if (!fs.existsSync(configPath)) {
+                console.log('⚠️  Config file not found, using defaults');
+                return {
+                    xp_loops: 10,
+                    gems_loops: 10,
+                    streaks_loops: 5,
+                    farming_type: 'all'
+                };
+            }
+            
+            const configData = fs.readFileSync(configPath, 'utf8');
+            const config = JSON.parse(configData);
+            console.log('✅ Config loaded successfully');
+            return config;
         } catch (error) {
-            console.error('Error loading config:', error.message);
+            console.error('❌ Error loading config:', error.message);
             return {
                 xp_loops: 10,
                 gems_loops: 10,
