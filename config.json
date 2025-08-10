@@ -1,0 +1,10 @@
+{
+  "xp_loops": 100,
+  "gems_loops": 50,
+  "streaks_loops": 30,
+  "farming_type": "all",
+  "delay_between_requests": 500,
+  "max_concurrent_requests": 3,
+  "retry_attempts": 3,
+  "request_timeout": 10000
+}
