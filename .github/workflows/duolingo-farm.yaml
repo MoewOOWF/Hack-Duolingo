@@ -45,11 +45,41 @@ jobs:
       with:
         node-version: '18'
         
+    - name: Create package-lock.json
+      run: |
+        cat > package-lock.json << 'EOF'
+        {
+          "name": "duolingo-auto-farm",
+          "version": "1.0.0",
+          "lockfileVersion": 3,
+          "requires": true,
+          "packages": {
+            "": {
+              "name": "duolingo-auto-farm",
+              "version": "1.0.0",
+              "dependencies": {
+                "axios": "^1.6.2"
+              }
+            }
+          }
+        }
+        EOF
+        
     - name: Install dependencies
       run: npm install
       
+    - name: Debug file structure
+      run: |
+        echo "=== Repository Structure ==="
+        find . -type f -name "*.js" -o -name "*.json" | sort
     - name: Update config
       run: |
+        echo "=== Source Directory ==="
+        ls -la src/
+        echo ""
+        echo "=== Package.json content ==="
+        cat package.json
+        echo ""
         cat > config.json << EOF
         {
           "xp_loops": ${{ github.event.inputs.xp_loops || 50 }},
